@@ -1,0 +1,145 @@
+#Residente: Camila de Freitas Maia
+#Matrícula: 25013449
+
+#Exercício 1
+
+# Definir caminho do projeto
+project_dir <- "C:/Users/seu_usuario/projeto_sifilis"
+
+# Verificar se existe
+if (!dir.exists(project_dir)) {
+  dir.create(project_dir, recursive = TRUE)
+  message("Pasta criada com sucesso!")
+} else {
+  message("Pasta já existe.")
+}
+
+# Definir como diretório de trabalho
+setwd(project_dir)
+
+# Conferir
+getwd() 
+
+#Exercício 2
+
+# Função para detectar erro e gerar prompt para solução
+gerar_prompt_erro <- function(expr, descricao_objetivo = "", contexto = "") {
+  
+  tryCatch(
+    {
+      resultado <- eval(expr)
+      cat("✅ Código executado com sucesso\n")
+      return(resultado)
+    },
+    
+    error = function(e) {
+      
+      codigo_texto <- paste(deparse(expr), collapse = "\n")
+      erro_msg <- e$message
+      
+      # Sugestões automáticas
+      sugestao <- ""
+      
+      if (grepl("object '.*' not found", erro_msg)) {
+        sugestao <- "Verifique se o objeto foi criado ou carregado corretamente."
+      } else if (grepl("could not find function", erro_msg)) {
+        sugestao <- "A função pode ser de um pacote não carregado. Use library()."
+      } else {
+        sugestao <- "Revise a sintaxe e os objetos utilizados."
+      }
+      
+      # Prompt gerado
+      prompt <- paste0(
+        "Estou tendo um erro em um script em R.\n\n",
+        "Código:\n", codigo_texto, "\n\n",
+        "Erro apresentado:\n", erro_msg, "\n\n",
+        "O que eu esperava que o código fizesse:\n", descricao_objetivo, "\n\n",
+        "Contexto adicional:\n", contexto, "\n\n",
+        "Pode me explicar:\n",
+        "1. O que significa esse erro?\n",
+        "2. Onde está o problema?\n",
+        "3. Como corrigir?\n",
+        "4. Mostrar código corrigido."
+      )
+      
+      cat("ERRO DETECTADO\n\n")
+      cat(prompt, "\n\n")
+      
+      cat("💡 SUGESTÃO:\n")
+      cat(sugestao, "\n")
+    }
+  )
+}
+
+gerar_prompt_erro(
+  expr = quote(mean(dados$idade)),
+  descricao_objetivo = "Calcular a média da idade",
+  contexto = "Base de dados de pacientes"
+)
+
+Código:
+  mean(dados$idade)
+
+Erro apresentado:
+  object 'dados' not found
+
+dados <- data.frame(idade = c(20, 30, 40))
+mean(dados$idade)
+
+
+#Exercício 3
+
+or (pkg in required_packages) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+    message(paste(pkg, "instalado e carregado."))
+  } else {
+    message(paste(pkg, "já está instalado e carregado."))
+  }
+}
+ #ou
+invisible(lapply(required_packages, function(pkg) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
+    message(pkg, " instalado.")
+  } else {
+    message(pkg, " já disponível.")
+  }
+}))
+
+# Exercício 4 
+
+
+create_data <- function(data, path) {
+  write.csv(data, path, row.names = FALSE)
+}
+
+
+read_data <- function(path) {
+  read.csv(path)
+}
+
+update_data <- function(data, condition, new_values) {
+  data[condition, ] <- new_values
+  return(data)
+}
+
+
+delete_data <- function(data, condition) {
+  data <- data[!condition, ]
+  return(data)
+}
+
+
+source("R/create.R")
+source("R/read.R")
+source("R/update.R")
+source("R/delete.R")
+
+df <- read_data("data/sifilis.csv")
+
+df <- update_data(df, df$idade < 15, NA)
+
+create_data(df, "output/sifilis_tratado.csv")
